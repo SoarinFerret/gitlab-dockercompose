@@ -1,0 +1,130 @@
+## GitLab configuration settings
+##! This file is generated during initial installation and **is not** modified
+##! during upgrades.
+##! Check out the latest version of this file to know about the different
+##! settings that can be configured by this file, which may be found at:
+##! https://gitlab.com/gitlab-org/omnibus-gitlab/raw/master/files/gitlab-config-template/gitlab.rb.template
+
+
+## GitLab URL
+##! URL on which GitLab will be reachable.
+##! For more details on configuring external_url see:
+##! https://docs.gitlab.com/omnibus/settings/configuration.html#configuring-the-external-url-for-gitlab
+external_url 'https://gitlab.example.com'
+registry_external_url 'https://registry.example.com'
+letsencrypt['enable'] = false
+gitlab_rails['gitlab_shell_ssh_port'] = 2222
+
+################################################################
+## GitLab SMTP
+################################################################
+
+### GitLab email server settings
+###! Docs: https://docs.gitlab.com/omnibus/settings/smtp.html
+###! **Use smtp instead of sendmail/postfix.**
+
+gitlab_rails['smtp_enable'] = true
+gitlab_rails['smtp_address'] = "smtp.examle.com"
+gitlab_rails['smtp_port'] = 587
+gitlab_rails['smtp_user_name'] = "postmaster"
+gitlab_rails['smtp_password'] = "xxxx"
+gitlab_rails['smtp_domain'] = "alerts.example.com"
+gitlab_rails['smtp_authentication'] = "login"
+gitlab_rails['smtp_enable_starttls_auto'] = true
+gitlab_rails['smtp_tls'] = true
+
+gitlab_rails['gitlab_email_from'] = 'gitlab@alerts.example.com'
+#gitlab_rails['gitlab_email_reply_to'] = 'noreply@alerts.example.com'
+
+alertmanager['listen_address'] = 'localhost:9093'
+
+################################################################
+## GitLab SAML
+################################################################
+
+gitlab_rails['omniauth_enabled'] = true
+gitlab_rails['omniauth_allow_single_sign_on'] = ['saml']
+gitlab_rails['omniauth_auto_sign_in_with_provider'] = 'saml'
+gitlab_rails['omniauth_block_auto_created_users'] = false
+gitlab_rails['omniauth_auto_link_saml_user'] = true
+gitlab_rails['omniauth_providers'] = [
+  {
+    name: 'saml',
+    args: {
+             assertion_consumer_service_url: 'https://gitlab.example.com/users/auth/saml/callback',
+             idp_cert_fingerprint: '43:51:43:a1:b5:fc:8b:b7:0a:3a:a9:b1:0f:66:73:a8',
+             idp_sso_target_url: 'https://sts.example.com/adfs/ls/', 
+             idp_slo_target_url: 'https://sts.example.com/adfs/ls/',
+             issuer: 'https://gitlab.example.com',
+             name_identifier_format: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+             attribute_statements: {
+                username: ['http://schemas.xmlsoap.org/ws /2005/05/identity/claims/upn'],
+                email: ['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
+                name: ['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
+                first_name: ['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'],
+                last_name: ['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'],
+             }
+           },
+    label: 'ADFS Login' # optional label for SAML login button, defaults to "Saml"
+  }
+]
+
+################################################################
+## GitLab PostgreSQL
+################################################################
+
+###! Changing any of these settings requires a restart of postgresql.
+###! By default, reconfigure reloads postgresql if it is running. If you
+###! change any of these settings, be sure to run `gitlab-ctl restart postgresql`
+###! after reconfigure in order for the changes to take effect.
+postgresql['enable'] = false
+
+### GitLab database settings
+###! Docs: https://docs.gitlab.com/omnibus/settings/database.html
+###! **Only needed if you use an external database.**
+gitlab_rails['db_host'] = "postgres"
+gitlab_rails['db_adapter'] = 'postgresql'
+gitlab_rails['db_encoding'] = 'utf8'
+gitlab_rails['db_port'] = 5432
+gitlab_rails['db_username'] = 'gitlab'
+gitlab_rails['db_password'] = 'pleasechangeme'
+
+################################################################################
+## GitLab Redis
+##! **Can be disabled if you are using your own Redis instance.**
+##! Docs: https://docs.gitlab.com/omnibus/settings/redis.html
+################################################################################
+
+redis['enable'] = false
+
+### GitLab Redis settings
+###! Connect to your own Redis instance
+###! Docs: https://docs.gitlab.com/omnibus/settings/redis.html
+gitlab_rails['redis_host'] = "redis"
+
+################################################################################
+## GitLab NGINX
+##! Docs: https://docs.gitlab.com/omnibus/settings/nginx.html
+################################################################################
+
+## My settings:
+nginx['redirect_http_to_https'] = true
+registry_nginx['redirect_http_to_https'] = true
+nginx['ssl_certificate'] = "/etc/letsencrypt/live/gitlab.example.com/fullchain.pem"
+nginx['ssl_certificate_key'] = "/etc/letsencrypt/live/gitlab.example.com/privkey.pem"
+registry_nginx['ssl_certificate'] = "/etc/letsencrypt/live/gitlab.example.com/fullchain.pem"
+registry_nginx['ssl_certificate_key'] = "/etc/letsencrypt/live/gitlab.example.com/privkey.pem"
+
+
+##! **Override only if your reverse proxy internally communicates over HTTP**
+##! Docs: https://docs.gitlab.com/omnibus/settings/nginx.html#supporting-proxied-ssl
+nginx['listen_https'] = true
+registry_nginx['listen_https'] = true
+#pages_nginx['listen_https'] = false
+
+################################################################################
+## GitLab Pages
+##! Docs: https://docs.gitlab.com/ce/pages/administration.html
+################################################################################
+
+gitlab_pages['enable'] = false

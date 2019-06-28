@@ -1,0 +1,4 @@
+# remove any .env files
+*.env
+gitlab.rb
+letsencrypt-domains.conf
